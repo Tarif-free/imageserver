@@ -1,0 +1,1 @@
+# An API that allows a mobile application's admin to upload images for the application.
