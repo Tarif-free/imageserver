@@ -8,7 +8,7 @@ const imageSchema = new Schema(
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "User"
     },
   },
   {
