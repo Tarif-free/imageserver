@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import validator from "validator";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
@@ -7,12 +8,14 @@ const userSchema = new Schema(
     username: {
       type: String,
       required: true,
+      minLength: [3, "UserName Must Contain At Least 3 Characters!"],
       trim: true,
     },
 
     email: {
       type: String,
       required: true,
+      validate: [validator.isEmail, "Provide A Valid Email!"],
       unique: true,
       lowercase: true,
       trim: true,
@@ -21,6 +24,13 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
+      minLength: [8, "Password Must Contain At Least 8 Characters!"],
+    },
+
+    role: {
+      type: String,
+      required: [true, "User Role Required!"],
+      enum: ["User", "Admin"],
     },
 
     refreshToken: {
