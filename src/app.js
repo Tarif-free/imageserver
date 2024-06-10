@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorMiddleware } from "./middlewares/erorr.middleware.js";
 import UserRouter from "./routes/user.routes.js" ;
+import imageRouter from "./routes/upload.routes.js"
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(cookieParser());
 
 //routes
 app.use("/api/v1/users", UserRouter)
+app.use("/api/v1/image", imageRouter)
 
 
 
