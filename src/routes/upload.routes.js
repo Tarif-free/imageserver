@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { isUserAuthenticated } from "../middlewares/auth.middleware.js";
-import { uploadImages, viewImages } from "../controllers/upload.controller.js";
+import { updateAllowedCategories, uploadImages, viewImages } from "../controllers/upload.controller.js";
 import  upload from "../middlewares/multer.middleware.js";
 
 
@@ -20,6 +20,13 @@ router.route("/upload")
 
      uploadImages);
 
+// Route for admin to update allowed categories
+router
+.post('/update-allowed-categories', isUserAuthenticated,
+     updateAllowedCategories);     
+
+
+     /////////// View images
      router.route ("/allImages").get(viewImages);
 
 
