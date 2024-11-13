@@ -6,6 +6,15 @@ const imageSchema = new Schema(
       type: String,
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+      enum: ["house", "mobile", "tree","dev"] 
+    },
+    tags: {
+      type: [String], 
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "User"
@@ -15,5 +24,8 @@ const imageSchema = new Schema(
     timestamps: true,
   }
 );
+
+imageSchema.index({ category: 1 });
+imageSchema.index({ tags: 1 });
 
 export const Image = mongoose.model("Image", imageSchema);
