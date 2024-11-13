@@ -20,11 +20,19 @@ const uploadOnCloudinary = async (localFilePath) => {
     return response;
 
   } catch (error) {
-    fs.unlinkSync(localFilePath);
+    if (localFilePath && fs.existsSync(localFilePath)) {
+      fs.unlinkSync(localFilePath);  
+    }
+
+    
     throw error;
   }
 };
 
+const deleteTempFileIfNeeded = (localFilePath) => {
+  if (localFilePath && fs.existsSync(localFilePath)) {
+    fs.unlinkSync(localFilePath);
+  }
+};
 
-
-export {uploadOnCloudinary}
+export { uploadOnCloudinary, deleteTempFileIfNeeded };
