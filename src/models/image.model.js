@@ -10,7 +10,7 @@ const imageSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      enum: ["house", "mobile", "tree","dev"] 
+      enum: ["house","mobile", "tree","dev","woman","man"] 
     },
     tags: {
       type: [String], 

@@ -1,11 +1,18 @@
+
 import mongoose from 'mongoose';
 
-const adminSettingsSchema = new mongoose.Schema({
+const appConfigSchema = new mongoose.Schema({
+  appName: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   allowedCategories: {
     type: [String],
     required: true,
-    enum: ['mobile', 'tree', 'house', 'mountain', 'man', 'woman'], // Predefined categories
+    
   },
 });
 
-export const AdminSettings = mongoose.model('AdminSettings', adminSettingsSchema);
+export const AppConfig = mongoose.model('AppConfig', appConfigSchema);
+

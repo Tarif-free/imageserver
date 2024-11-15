@@ -3,7 +3,7 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import {uploadOnCloudinary, deleteTempFileIfNeeded} from "../utils/cloudinary.js";
 import { Image } from "../models/image.model.js";
-import { AdminSettings } from "../models/allowedCategories.model.js";
+import {AppConfig} from '../models/allowedCategories.model.js';
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 
@@ -81,35 +81,57 @@ const uploadImages = asyncHandler (async(req, res) => {
 })
 
 
- const updateAllowedCategories = asyncHandler(async (req, res) => {
-  const { allowedCategories } = req.body;
+ const setAppConfig = asyncHandler(async (req, res) => {
+  
 
   // Validate admin role
   if (req.user.role !== "Admin") {
     throw new ApiError(403, "Access denied. Only admins can update settings.");
   }
 
-  const settings = await AdminSettings.findOneAndUpdate(
-    {},
-    { allowedCategories },
-    { upsert: true, new: true }
-  );
+////append: true:-Append Additional Categories
+////append: false:-Replace All Categories
 
-  return res.status(200).json(new ApiResponse(200, settings, "Allowed categories updated."));
+  const { appName, allowedCategories, append} = req.body;
+
+  if (!appName || !allowedCategories) {
+    throw new ApiError(400, 'App name and allowed categories are required.');
+  }
+
+  let appConfig;
+  if (append) {
+    // Find existing config and add new categories
+    appConfig = await AppConfig.findOneAndUpdate(
+      { appName },
+      { $addToSet: { allowedCategories: { $each: allowedCategories } } }, // Prevent duplicates
+      { upsert: true, new: true }
+    );
+  } else {
+    // Replace with new categories
+    appConfig = await AppConfig.findOneAndUpdate(
+      { appName },
+      { allowedCategories },
+      { upsert: true, new: true }
+    );
+  }
+
+  return res.status(200).json(new ApiResponse(200, appConfig, `${appName} configuration updated successfully.`,));
 });
 
 
 
-const viewImages = asyncHandler( async(req, res) => {
-  const settings = await AdminSettings.findOne();
-  if (!settings) {
-    throw new ApiError(400, "Admin settings not found.");
+const viewImagesByApp = asyncHandler(async (req, res) => {
+  const { appName } = req.query;
+
+  const appConfig = await AppConfig.findOne({ appName });
+  if (!appConfig) {
+    throw new ApiError(404, 'App configuration not found.');
   }
 
-  const allowedCategories = settings.allowedCategories;
+  const images = await Image.find({
+    category: { $in: appConfig.allowedCategories },
+  });
 
-  // Filter images based on allowed categories
-  const images = await Image.find({ category: { $in: allowedCategories } });
  return res
     .status(200).
     json(new ApiResponse(200, images,"Successfully fetch all images"));
@@ -117,8 +139,8 @@ const viewImages = asyncHandler( async(req, res) => {
 
 export {
     uploadImages,
-    updateAllowedCategories,
-    viewImages
+    setAppConfig,
+    viewImagesByApp
 }
 
 
